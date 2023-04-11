@@ -9,9 +9,9 @@ use sqlx::{
 };
 use uuid::Uuid;
 
-struct TestDb {
-    server_url: String,
-    db_name: String,
+pub struct TestDb {
+    pub server_url: String,
+    pub db_name: String,
 }
 
 impl TestDb {
