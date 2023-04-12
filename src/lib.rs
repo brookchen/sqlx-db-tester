@@ -1,12 +1,10 @@
-use std::{
-    path::Path,
-    thread,
-};
+use std::{path::Path, thread};
 
 use anyhow::Result;
 use sqlx::{
     migrate::Migrator, postgres::PgPoolOptions, Connection, Executor, PgConnection, PgPool,
 };
+use tokio::runtime::*;
 use uuid::Uuid;
 
 pub struct TestDb {
@@ -24,7 +22,8 @@ impl TestDb {
         let migration_path = migration_path.as_ref().to_path_buf();
         let db_name_clone = db_name.clone();
         thread::spawn(move || {
-            futures::executor::block_on(async move {
+            let rt = Runtime::new().unwrap();
+            rt.block_on(async move {
                 let mut conn = PgConnection::connect(&manage_url).await.unwrap();
                 conn.execute(format!(r#"CREATE DATABASE "{}""#, db_name_clone).as_str())
                     .await
@@ -61,18 +60,19 @@ impl Drop for TestDb {
         let manage_url = format!("{}/postgres", self.server_url);
         let db_name = self.db_name.clone();
         thread::spawn(move || {
-                futures::executor::block_on(async move {
-                    let mut conn = PgConnection::connect(&manage_url).await.unwrap();
-                    conn.execute(format!(r#"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = '{}'"#, db_name).as_str())
-                        .await
-                        .unwrap();
-                    conn.execute(format!(r#"DROP DATABASE "{}""#, db_name).as_str())
-                        .await
-                        .unwrap();
-                })
+            let rt = Runtime::new().unwrap();
+            rt.block_on(async move {
+                let mut conn = PgConnection::connect(&manage_url).await.unwrap();
+                conn.execute(format!(r#"SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = '{}'"#, db_name).as_str())
+                    .await
+                    .unwrap();
+                conn.execute(format!(r#"DROP DATABASE "{}""#, db_name).as_str())
+                    .await
+                    .unwrap();
             })
-            .join()
-            .unwrap();
+        })
+        .join()
+        .unwrap();
     }
 }
 
@@ -80,7 +80,7 @@ impl Drop for TestDb {
 mod tests {
     use super::*;
 
-    #[futures_test::test]
+    #[tokio::test]
     async fn test_db_migration_should_work() {
         let testdb = TestDb::new("postgres://brook@localhost:5432", "./migrations").unwrap();
 

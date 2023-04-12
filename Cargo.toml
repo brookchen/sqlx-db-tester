@@ -16,9 +16,8 @@ keywords = []
 
 [dependencies]
 anyhow = "1.0.70"
-futures = "0.3.28"
-sqlx = { version = "0.6.3", features = ["runtime-async-std-rustls", "postgres"] }
+sqlx = { version = "0.6.3", features = ["runtime-tokio-rustls", "postgres"] }
+tokio = { version = "1.27.0", features = ["full"] }
 uuid = { version = "1.3.1", features = ["v4"] }
 
 [dev-dependencies]
-futures-test = "0.3.28"
