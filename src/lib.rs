@@ -82,7 +82,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_db_migration_should_work() {
-        let testdb = TestDb::new("postgres://brook:postgres@localhost:5432", "./migrations").unwrap();
+        let testdb =
+            TestDb::new("postgres://brook:postgres@localhost:5432", "./migrations").unwrap();
 
         let pool = testdb.get_pool().await;
         sqlx::query("insert into todos(title) values($1)")
