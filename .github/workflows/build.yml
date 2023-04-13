@@ -18,8 +18,8 @@ jobs:
         postgres:
           image: postgres:15.2
           env:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: postgres
+            POSTGRES_USER: brook 
+            POSTGRES_PASSWORD:
             POSTGRES_DB: test
           ports:
             - 5432:5432
