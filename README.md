@@ -2,12 +2,12 @@
 
 # sqlx-db-tester
 
-description about the crate
+A tool for tonic service test.
 
 ## How to use it
 
 ```bash
-$ cargo generate --git https://github.com/tyrchen/rust-lib-template
+$ cargo generate --git https://github.com/brookchen/rust-lib-template
 ```
 
 Have fun with this crate!
